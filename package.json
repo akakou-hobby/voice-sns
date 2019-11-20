@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/akakou/voice-sns/issues"
   },
-  "homepage": "https://github.com/akakou/voice-sns#readme"
+  "homepage": "https://github.com/akakou/voice-sns#readme",
+  "dependencies": {
+    "firebase": "^7.4.0"
+  }
 }
