@@ -1,0 +1,25 @@
+{
+  "name": "voice-sns",
+  "version": "1.0.0",
+  "description": "スマートスピーカーを利用した音声のみで操作するSNS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akakou/voice-sns.git"
+  },
+  "author": "akakou",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/akakou/voice-sns/issues"
+  },
+  "homepage": "https://github.com/akakou/voice-sns#readme",
+  "dependencies": {
+    "firebase": "^7.4.0",
+    "ibm-watson": "^5.1.0",
+    "node-record-lpcm16": "^1.0.1",
+    "simplayer": "0.0.8"
+  }
+}
