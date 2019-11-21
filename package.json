@@ -19,6 +19,7 @@
   "dependencies": {
     "firebase": "^7.4.0",
     "ibm-watson": "^5.1.0",
-    "node-record-lpcm16": "^1.0.1"
+    "node-record-lpcm16": "^1.0.1",
+    "simplayer": "0.0.8"
   }
 }

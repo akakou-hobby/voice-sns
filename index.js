@@ -14,6 +14,10 @@ judgerRules = [
   {
     words: ["投稿"],
     callback: sns.postMessage
+  },
+  {
+    words: ["TL", "タイムライン", "投稿一覧", "他の人"],
+    callback: sns.acquirePosts
   }
 ];
 

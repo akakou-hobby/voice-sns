@@ -4,6 +4,8 @@ const config = require("./config");
 const fs = require("fs");
 const readline = require("readline");
 
+const simplayer = require("simplayer");
+
 const SpeechToTextV1 = require("ibm-watson/speech-to-text/v1");
 const { IamAuthenticator } = require("ibm-watson/auth");
 
@@ -57,9 +59,14 @@ class SmartSpearker {
     speech_to_text.recognize(watsonParam, (error, transcript) => {
       if (error) console.log("Error:", error);
       else {
-        const msg = transcript.result.results[0].alternatives[0].transcript;
-        console.log(msg);
-        callback(self, msg);
+        const unfilteredMsg =
+          transcript.result.results[0].alternatives[0].transcript;
+
+        const filteredMsg = unfilteredMsg.replace(/\s+/g, "");
+
+        console.log(filteredMsg);
+
+        callback(self, filteredMsg);
       }
     });
   }
@@ -80,6 +87,20 @@ class SmartSpearker {
 
   say(msg) {
     console.log(msg);
+  }
+
+  playSound(data, callback) {
+    fs.writeFileSync("tmp.wav", data, error => {
+      console.log(error);
+    });
+
+    console.log("sound start");
+    var musicProcess = simplayer("./tmp.wav", error => {
+      if (error) console.log(error);
+
+      console.log("sound stop");
+      callback();
+    });
   }
 
   run() {
