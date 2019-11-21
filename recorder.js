@@ -1,14 +1,15 @@
+const config = require("./config");
+
 const fs = require("fs");
 const recorder = require("node-record-lpcm16");
 
 class Recoader {
-  constructor(filename) {
-    this.filename = filename;
-  }
+  constructor() {}
   startRecord() {
-    const tmpFile = fs.createWriteStream(this.filename, { encoding: "binary" });
+    const tmpFile = fs.createWriteStream(config.tmpFile, {
+      encoding: "binary"
+    });
     // 録音する
-    console.log("recoading...");
     this.recorder = recorder.record();
     this.recorder.stream().pipe(tmpFile);
   }
@@ -16,7 +17,6 @@ class Recoader {
   stopRecord() {
     // 録音の終了
     this.recorder.stop();
-    console.log("done");
   }
 }
 

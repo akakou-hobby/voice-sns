@@ -7,70 +7,87 @@ const readline = require("readline");
 const SpeechToTextV1 = require("ibm-watson/speech-to-text/v1");
 const { IamAuthenticator } = require("ibm-watson/auth");
 
-const stdin = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  terminal: false
-});
-
 const speech_to_text = new SpeechToTextV1({
   authenticator: new IamAuthenticator(config.watson.auth)
 });
 
 class SmartSpearker {
   constructor(rules) {
-    this.filename = "tmp.wav";
     this.rules = rules;
-    this.recorder = new Recoader(this.filename);
+    this.recorder = new Recoader();
     console.log(this.recorder);
   }
 
-  listenSaying(callback) {
-    console.log(this.recorder);
-
-    this.recorder.startRecord();
-
-    // gpioで置き換え
-    setTimeout(() => {
-      this.recorder.stopRecord();
-
-      const watsonParam = {
-        model: "ja-JP_BroadbandModel",
-        audio: fs.createReadStream(this.filename),
-        contentType: "audio/wav"
-      };
-
-      console.log("speech apiに送信");
-      speech_to_text.recognize(watsonParam, (error, transcript) => {
-        if (error) console.log("Error:", error);
-        else {
-          const msg = transcript.result.results[0].alternatives[0].transcript;
-          console.log(msg);
-          callback(msg, this);
-        }
-      });
-    }, 2000);
+  closeEvent() {
+    this.stdin.close();
   }
 
-  judge(sentence, self) {
+  recordSaying(callback, args) {
+    this.stdin = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      terminal: false
+    });
+
+    const self = this;
+
+    this.stdin.on("line", line => {
+      self.say("recording ...");
+      self.recorder.startRecord();
+
+      // gpioで置き換え
+      setTimeout(() => {
+        self.say("stop recording");
+
+        self.recorder.stopRecord();
+        callback(self, config.tmpFile, args);
+      }, 2000);
+    });
+  }
+
+  recognizeSaying(self, _, callback) {
+    console.log("speech apiに送信");
+
+    const watsonParam = {
+      model: "ja-JP_BroadbandModel",
+      audio: fs.createReadStream(config.tmpFile),
+      contentType: "audio/wav"
+    };
+
+    speech_to_text.recognize(watsonParam, (error, transcript) => {
+      if (error) console.log("Error:", error);
+      else {
+        const msg = transcript.result.results[0].alternatives[0].transcript;
+        console.log(msg);
+        callback(self, msg);
+      }
+    });
+  }
+
+  judge(self, sentence) {
     // スピーチの取得
     for (const rule of self.rules) {
       for (const word of rule.words) {
         if (sentence.indexOf(word) != -1) {
-          rule.callback();
+          rule.callback(self);
           return;
         }
       }
     }
+
+    self.say("コマンドが見つかりませんでした");
+  }
+
+  say(msg) {
+    console.log(msg);
   }
 
   run() {
-    const self = this;
+    this.recordSaying(this.recognizeSaying, this.judge);
+  }
 
-    // gpioで置き換え
-    stdin.on("line", line => {
-      self.listenSaying(self.judge);
-    });
+  restart() {
+    this.run();
   }
 }
 
