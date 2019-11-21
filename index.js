@@ -2,6 +2,7 @@ var firebase = require("firebase/app")
 
 require("firebase/auth")
 require("firebase/firestore")
+const fs = require('fs')
 
 const config = require("./config")
 console.log(config)
@@ -42,3 +43,23 @@ firebase.auth().onAuthStateChanged((user) => {
 });
 
 
+const SpeechToTextV1 = require('ibm-watson/speech-to-text/v1');
+const { IamAuthenticator } = require('ibm-watson/auth')
+
+
+const params = {
+    model: 'ja-JP_BroadbandModel',
+    audio: fs.createReadStream('sample.ogg'),
+    contentType: 'audio/ogg',
+};
+
+const speech_to_text = new SpeechToTextV1({
+    authenticator: new IamAuthenticator(config.watson.auth)
+});
+
+speech_to_text.recognize(params, (error, transcript) => {
+    if (error)
+        console.log('Error:', error);
+    else
+        console.log(JSON.stringify(transcript, null, 2));
+});
