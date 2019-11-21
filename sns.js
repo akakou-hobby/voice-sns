@@ -39,8 +39,7 @@ const postMessage = IO => {
   const date = new Date();
   const now = date.getTime();
 
-  console.log("録音を開始します。");
-  console.log("ボタンを押してください。");
+  IO.say("録音を開始します。ボタンを押してください。");
 
   IO.closeEvent();
 
@@ -85,22 +84,20 @@ const acquirePosts = async IO => {
     });
   });
 
-  IO.say(`新着の投稿を${posts.length}個、再生します。`);
+  IO.say(`新着の投稿を${posts.length}件、再生します。`, () => {
+    const rootine = () => {
+      post = posts.pop();
+      if (!post) {
+        return;
+      }
 
-  const rootine = () => {
-    post = posts.pop();
-    if (!post) {
-      return;
-    }
+      const decode = Buffer.from(post.sound, "base64");
 
-    IO.say(post.id);
+      IO.playSound(decode, rootine);
+    };
 
-    const decode = Buffer.from(post.sound, "base64");
-
-    IO.playSound(decode, rootine);
-  };
-
-  rootine();
+    rootine();
+  });
 };
 
 module.exports = {
