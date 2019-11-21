@@ -8,6 +8,8 @@ const config = require("./config")
 console.log(config)
 firebase.initializeApp(config.firebase)
 
+const recorder = require('node-record-lpcm16')
+
 email = 'hoge@example.com'
 password = 'hogehoge'
 
@@ -46,20 +48,35 @@ firebase.auth().onAuthStateChanged((user) => {
 const SpeechToTextV1 = require('ibm-watson/speech-to-text/v1');
 const { IamAuthenticator } = require('ibm-watson/auth')
 
-
-const params = {
-    model: 'ja-JP_BroadbandModel',
-    audio: fs.createReadStream('sample.ogg'),
-    contentType: 'audio/ogg',
-};
-
 const speech_to_text = new SpeechToTextV1({
     authenticator: new IamAuthenticator(config.watson.auth)
 });
 
-speech_to_text.recognize(params, (error, transcript) => {
+const tmpFile = fs.createWriteStream('tmp.wav', { encoding: 'binary' })
+
+recorder.record({
+  sampleRate: 44100
+})
+
+console.log('recoading...')
+const recording = recorder.record()
+recording.stream().pipe(tmpFile)
+
+setTimeout(() => {
+  recording.stop()
+  console.log('done')
+
+  const params = {
+    model: 'ja-JP_BroadbandModel',
+    audio: fs.createReadStream('tmp.wav'),
+    contentType: 'audio/wav',
+  };
+
+  speech_to_text.recognize(params, (error, transcript) => {
     if (error)
-        console.log('Error:', error);
+      console.log('Error:', error);
     else
-        console.log(JSON.stringify(transcript, null, 2));
-});
+    console.log(JSON.stringify(transcript, null, 2));
+  });
+
+}, 5000)
