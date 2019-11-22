@@ -8,8 +8,12 @@ const config = require("./config");
 
 judgerRules = [
   {
-    words: ["ログイン"],
+    words: ["ログイン", "サインイン"],
     callback: sns.login
+  },
+  {
+    words: ["ログアウト", "サインアウト"],
+    callback: sns.logout
   },
   {
     words: ["投稿"],
