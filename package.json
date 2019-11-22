@@ -20,6 +20,7 @@
     "firebase": "^7.4.0",
     "ibm-watson": "^5.1.0",
     "node-record-lpcm16": "^1.0.1",
+    "onoff": "^5.0.0",
     "simplayer": "0.0.8"
   }
 }

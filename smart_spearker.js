@@ -32,9 +32,13 @@ class SmartSpearker {
 
   recordSaying(callback, args) {
     const self = this;
-    this.button = new Gpio(4, "in", "both");
+    this.button = new Gpio(14, "in", "both");
 
     this.button.watch((err, value) => {
+      
+      if (value) {
+      	return
+      }
       self.recorder.startRecord();
 
       // gpioで置き換え
@@ -131,3 +135,4 @@ class SmartSpearker {
 }
 
 module.exports.SmartSpearker = SmartSpearker;
+
