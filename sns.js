@@ -16,6 +16,7 @@ firebase.auth().onAuthStateChanged(user => {
   if (user) {
     uid = user.uid;
   } else {
+    uid = null;
   }
 });
 
@@ -29,6 +30,18 @@ const login = IO => {
     });
 
   IO.say("ログインしました");
+};
+
+const logout = IO => {
+  firebase
+    .auth()
+    .signOut()
+    .catch(error => {
+      console.log(error.code);
+      console.log(error.message);
+    });
+
+  IO.say("ログアウトしました");
 };
 
 const postMessage = IO => {
@@ -102,6 +115,7 @@ const acquirePosts = async IO => {
 
 module.exports = {
   login: login,
+  logout: logout,
   postMessage: postMessage,
   acquirePosts: acquirePosts
 };
