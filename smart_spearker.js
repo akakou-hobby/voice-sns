@@ -5,6 +5,7 @@ const fs = require("fs");
 const readline = require("readline");
 
 const simplayer = require("simplayer");
+const Gpio = require("onoff").Gpio;
 
 const SpeechToTextV1 = require("ibm-watson/speech-to-text/v1");
 const { IamAuthenticator } = require("ibm-watson/auth");
@@ -26,26 +27,21 @@ class SmartSpearker {
   }
 
   closeEvent() {
-    this.stdin.close();
+    this.button.unexport();
   }
 
   recordSaying(callback, args) {
-    this.stdin = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-      terminal: false
-    });
-
     const self = this;
+    this.button = new Gpio(4, "in", "both");
 
-    this.stdin.on("line", line => {
+    this.button.watch((err, value) => {
       self.recorder.startRecord();
 
       // gpioで置き換え
       setTimeout(() => {
         self.recorder.stopRecord();
         callback(self, config.tmpFile, args);
-      }, 2000);
+      }, 5000);
     });
   }
 
